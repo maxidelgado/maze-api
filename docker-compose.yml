@@ -6,7 +6,7 @@ services:
     image: mongo
     restart: always
     ports:
-    - 27017:27017
+      - 27017:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
@@ -19,3 +19,17 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
+
+  maze:
+    build: .
+    restart: always
+    environment:
+      DB_USER: root
+      DB_PWD: example
+      ROUTER_HOST: :3000
+      BASE_PATH: /api/v1
+      DB_NAME: maze
+      DB_COL: mazes
+      DB_HOST: mongo:27017
+    ports:
+      - 3000:3000
