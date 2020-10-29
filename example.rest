@@ -1,0 +1,154 @@
+POST localhost:3000/api/v1/maze
+Content-Type: application/json
+
+{
+  "center": [
+    0,
+    0
+  ],
+  "spots": [
+    {
+      "name": "entrance",
+      "gold_amount": 0,
+      "coordinate": [
+        1,
+        1
+      ]
+    },
+    {
+      "name": "treasure room",
+      "gold_amount": 10,
+      "coordinate": [
+        1,
+        -1
+      ]
+    },
+    {
+      "name": "trap",
+      "gold_amount": -5,
+      "coordinate": [
+        -1,
+        -1
+      ]
+    },
+    {
+      "name": "exit",
+      "gold_amount": 50,
+      "coordinate": [
+        -1,
+        1
+      ]
+    }
+  ],
+  "paths": [
+    {
+      "edge": [
+        [
+          1,
+          1
+        ],
+        [
+          1,
+          -1
+        ]
+      ]
+    },
+    {
+      "edge": [
+        [
+          1,
+          -1
+        ],
+        [
+          -1,
+          -1
+        ]
+      ]
+    },
+    {
+      "edge": [
+        [
+          -1,
+          -1
+        ],
+        [
+          -1,
+          1
+        ]
+      ]
+    }
+  ]
+}
+
+###
+
+PUT localhost:3000/api/v1/maze/0a0abf75-e757-46ca-8073-9bef771da5ae
+Content-Type: application/json
+
+{
+  "center": [
+    0,
+    0
+  ],
+  "spots": [
+    {
+      "name": "another spot",
+      "gold_amount": 0,
+      "coordinate": [
+        2,
+        2
+      ]
+    }
+  ],
+  "paths": [
+    {
+      "edge": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          2
+        ]
+      ]
+    }
+  ]
+}
+
+###
+
+GET localhost:3000/api/v1/maze/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88
+
+###
+
+
+DELETE localhost:3000/api/v1/maze/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88/paths
+Content-Type: application/json
+
+{
+  "edge": [
+    [
+      -1,
+      -1
+    ],
+    [
+      -1,
+      1
+    ]
+  ]
+}
+
+###
+
+DELETE localhost:3000/api/v1/maze/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88/spots
+Content-Type: application/json
+
+[
+  1,
+  1
+]
+
+###
+
+DELETE localhost:3000/api/v1/maze/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88
