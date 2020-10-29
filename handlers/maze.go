@@ -17,15 +17,15 @@ type mazeHandler struct {
 }
 
 func (h mazeHandler) setupRoutes() {
-	m := h.router.Group("/maze")
+	m := h.router.Group("/mazes")
 	{
 		m.Post("", h.postMaze)
 		m.Get("/:id", h.getMaze)
 		m.Put("/:id", h.putMaze)
 		m.Delete("/:id", h.deleteMaze)
 
-		m.Delete("/:id/spots", h.deleteSpot)
-		m.Delete("/:id/paths", h.deletePath)
+		m.Delete("/:id/spot", h.deleteSpot)
+		m.Delete("/:id/path", h.deletePath)
 	}
 }
 

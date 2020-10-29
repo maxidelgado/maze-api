@@ -1,4 +1,4 @@
-POST localhost:3000/api/v1/maze
+POST localhost:3000/api/v1/mazes
 Content-Type: application/json
 
 {
@@ -82,7 +82,7 @@ Content-Type: application/json
 
 ###
 
-PUT localhost:3000/api/v1/maze/0a0abf75-e757-46ca-8073-9bef771da5ae
+PUT localhost:3000/api/v1/mazes/0a0abf75-e757-46ca-8073-9bef771da5ae
 Content-Type: application/json
 
 {
@@ -118,12 +118,12 @@ Content-Type: application/json
 
 ###
 
-GET localhost:3000/api/v1/maze/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88
+GET localhost:3000/api/v1/mazes/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88
 
 ###
 
 
-DELETE localhost:3000/api/v1/maze/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88/paths
+DELETE localhost:3000/api/v1/mazes/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88/path
 Content-Type: application/json
 
 {
@@ -141,7 +141,7 @@ Content-Type: application/json
 
 ###
 
-DELETE localhost:3000/api/v1/maze/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88/spots
+DELETE localhost:3000/api/v1/mazes/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88/spot
 Content-Type: application/json
 
 [
@@ -151,4 +151,4 @@ Content-Type: application/json
 
 ###
 
-DELETE localhost:3000/api/v1/maze/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88
+DELETE localhost:3000/api/v1/mazes/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88
