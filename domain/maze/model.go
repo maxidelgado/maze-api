@@ -3,6 +3,7 @@ package maze
 import (
 	"fmt"
 	"math"
+	"strings"
 )
 
 const (
@@ -48,28 +49,56 @@ func (m *Maze) setQuadrants(x, y int64) {
 	}
 }
 
-func (m *Maze) addSpot(spot Spot) {
+func (m *Maze) getCoordinateQuadrant(coordinate Coordinate) (id string, index int) {
 	quadrant := m.Quadrants[TopLeftIndex]
-	isLeft := spot.Coordinate.X() <= quadrant.LimitX.Y()
-	isTop := spot.Coordinate.Y() >= quadrant.LimitY.X()
-
-	addSpotToQuadrant := func(index int) {
-		if m.Quadrants[index].Spots == nil {
-			m.Quadrants[index].Spots = make(map[string]Spot)
-		}
-		m.Quadrants[index].Spots[spot.Coordinate.Key()] = spot
-	}
+	isLeft := coordinate.X() <= quadrant.LimitX.Y()
+	isTop := coordinate.Y() >= quadrant.LimitY.X()
 
 	switch {
 	case isTop && isLeft:
-		addSpotToQuadrant(TopLeftIndex)
+		id = TopLeft
+		index = TopLeftIndex
+		return
 	case isTop && !isLeft:
-		addSpotToQuadrant(TopRightIndex)
+		id = TopRight
+		index = TopRightIndex
+		return
 	case !isTop && isLeft:
-		addSpotToQuadrant(BottomLeftIndex)
+		id = BottomLeft
+		index = BottomLeftIndex
+		return
 	case !isTop && !isLeft:
-		addSpotToQuadrant(BottomRightIndex)
+		id = BottomRight
+		index = BottomRightIndex
+		return
+	default:
+		return "", 0
 	}
+}
+
+func (m *Maze) addSpot(spot Spot) {
+	_, index := m.getCoordinateQuadrant(spot.Coordinate)
+	if m.Quadrants[index].Spots == nil {
+		m.Quadrants[index].Spots = make(map[string]Spot)
+	}
+	m.Quadrants[index].Spots[spot.Coordinate.Key()] = spot
+}
+
+func (m *Maze) deleteSpot(coordinate Coordinate) {
+	_, index := m.getCoordinateQuadrant(coordinate)
+	if m.Quadrants[index].Spots == nil {
+		m.Quadrants[index].Spots = make(map[string]Spot)
+	}
+	delete(m.Quadrants[index].Spots, coordinate.Key())
+	for key := range m.Paths {
+		if strings.Contains(key, coordinate.Key()) {
+			delete(m.Paths, key)
+		}
+	}
+}
+
+func (m *Maze) deletePath(path Path) {
+	delete(m.Paths, path.Key())
 }
 
 func (m *Maze) findSpot(coordinate Coordinate) bool {
@@ -121,6 +150,13 @@ func (m Maze) moveAxes(x, y int64) Maze {
 	return maze
 }
 
+func (m Maze) getCenter() (int64, int64) {
+	x := m.Quadrants[0].LimitX.Y()
+	y := m.Quadrants[0].LimitY.X()
+
+	return x, y
+}
+
 type Quadrant struct {
 	Id     string          `json:"id" bson:"_id"`
 	LimitX Coordinate      `json:"limit_x" bson:"limit_x"`
@@ -129,7 +165,6 @@ type Quadrant struct {
 }
 
 type Spot struct {
-	Id         string     `json:"id" bson:"_id"`
 	Name       string     `json:"name" bson:"name"`
 	Coordinate Coordinate `json:"coordinate" bson:"coordinate"`
 	GoldAmount int        `json:"gold_amount" bson:"gold_amount"`
@@ -161,5 +196,5 @@ func (c Coordinate) Y() int64 {
 }
 
 func (c Coordinate) Key() string {
-	return fmt.Sprintf("(%v,%v)", c.X(), c.Y())
+	return fmt.Sprintf("[%v,%v]", c.X(), c.Y())
 }

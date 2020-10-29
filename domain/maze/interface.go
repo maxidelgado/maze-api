@@ -1,17 +1,24 @@
 package maze
 
-import "context"
+import (
+	"context"
+)
 
 type Service interface {
-	GetMaze(context.Context, string) (Maze, error)
-	CreateMaze(context.Context, Coordinate, []Spot, []Path) (string, error)
-	UpdateQuadrants(context.Context, string, Coordinate) error
-	PutSpots(context.Context, string, []Spot) error
-	PutPaths(context.Context, string, []Path) error
+	Get(context.Context, string) (Maze, error)
+	Create(context.Context, Coordinate, []Spot, []Path) (string, error)
+	Update(context.Context, string, Coordinate, []Spot, []Path) error
+	Delete(context.Context, string) error
+
+	DeleteSpot(context.Context, string, Coordinate) error
+	DeletePath(context.Context, string, Path) error
 }
 
 type DataBase interface {
-	Get(context.Context, string) (Maze, error)
-	Put(context.Context, Maze) error
-	Update(context.Context, Maze) error
+	GetMaze(context.Context, string) (Maze, error)
+	PutMaze(context.Context, Maze) error
+	UpdateMaze(context.Context, Maze) error
+	DeleteMaze(context.Context, string) error
+
+	DeleteSpot(context.Context, string, string, Coordinate) error
 }

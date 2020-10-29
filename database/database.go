@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/maxidelgado/maze-api/config"
@@ -37,12 +38,12 @@ type database struct {
 	collection *mongo.Collection
 }
 
-func (d database) Put(ctx context.Context, maze maze.Maze) error {
+func (d database) PutMaze(ctx context.Context, maze maze.Maze) error {
 	_, err := d.collection.InsertOne(ctx, maze)
 	return err
 }
 
-func (d database) Update(ctx context.Context, maze maze.Maze) error {
+func (d database) UpdateMaze(ctx context.Context, maze maze.Maze) error {
 	_, err := d.collection.UpdateOne(
 		ctx,
 		bson.D{{Key: "_id", Value: maze.Id}},
@@ -51,9 +52,9 @@ func (d database) Update(ctx context.Context, maze maze.Maze) error {
 	return err
 }
 
-func (d database) Get(ctx context.Context, mazeId string) (maze.Maze, error) {
+func (d database) GetMaze(ctx context.Context, id string) (maze.Maze, error) {
 	var result maze.Maze
-	out := d.collection.FindOne(ctx, bson.D{{Key: "_id", Value: mazeId}})
+	out := d.collection.FindOne(ctx, bson.D{{Key: "_id", Value: id}})
 	if out.Err() != nil {
 		return maze.Maze{}, out.Err()
 	}
@@ -64,4 +65,23 @@ func (d database) Get(ctx context.Context, mazeId string) (maze.Maze, error) {
 	}
 
 	return result, err
+}
+
+func (d database) DeleteMaze(ctx context.Context, id string) error {
+	_, err := d.collection.DeleteOne(ctx, bson.D{{Key: "_id", Value: id}})
+	return err
+}
+
+func (d database) DeleteSpot(ctx context.Context, mazeId, quadrantId string, coordinate maze.Coordinate) error {
+	key := fmt.Sprintf("quadrants.spots.%s", coordinate.Key())
+	_, err := d.collection.UpdateOne(ctx,
+		bson.D{
+			{Key: "_id", Value: mazeId},
+		},
+		bson.D{
+			{Key: "$pull", Value: bson.E{Key: key, Value: ""}},
+		},
+	)
+
+	return err
 }

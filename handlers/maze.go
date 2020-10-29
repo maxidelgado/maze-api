@@ -19,26 +19,28 @@ type mazeHandler struct {
 func (h mazeHandler) setupRoutes() {
 	m := h.router.Group("/maze")
 	{
-		m.Get("/:id", h.getMaze)
 		m.Post("", h.postMaze)
-		m.Put("/spots", h.putSpots)
-		m.Put("/paths", h.putPaths)
-		m.Put("/quadrants", h.putQuadrants)
+		m.Get("/:id", h.getMaze)
+		m.Put("/:id", h.putMaze)
+		m.Delete("/:id", h.deleteMaze)
+
+		m.Delete("/:id/spots", h.deleteSpot)
+		m.Delete("/:id/paths", h.deletePath)
 	}
 }
 
 func (h mazeHandler) postMaze(ctx *fiber.Ctx) error {
 	var body struct {
-		Coordinate maze.Coordinate `json:"coordinate"`
-		Spots      []maze.Spot     `json:"spots"`
-		Paths      []maze.Path     `json:"paths"`
+		Center maze.Coordinate `json:"center"`
+		Spots  []maze.Spot     `json:"spots"`
+		Paths  []maze.Path     `json:"paths"`
 	}
 
 	if err := ctx.BodyParser(&body); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	id, err := h.svc.CreateMaze(ctx.Context(), body.Coordinate, body.Spots, body.Paths)
+	id, err := h.svc.Create(ctx.Context(), body.Center, body.Spots, body.Paths)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -52,7 +54,7 @@ func (h mazeHandler) getMaze(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "id is required in path"})
 	}
 
-	m, err := h.svc.GetMaze(ctx.Context(), id)
+	m, err := h.svc.Get(ctx.Context(), id)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -60,17 +62,15 @@ func (h mazeHandler) getMaze(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(m)
 }
 
-func (h mazeHandler) putSpots(ctx *fiber.Ctx) error {
-	var body struct {
-		Id    string      `json:"id"`
-		Spots []maze.Spot `json:"spots"`
-	}
+func (h mazeHandler) deleteSpot(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
 
-	if err := ctx.BodyParser(&body); err != nil {
+	var coordinate maze.Coordinate
+	if err := ctx.BodyParser(&coordinate); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	err := h.svc.PutSpots(ctx.Context(), body.Id, body.Spots)
+	err := h.svc.DeleteSpot(ctx.Context(), id, coordinate)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -78,17 +78,15 @@ func (h mazeHandler) putSpots(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(http.StatusOK)
 }
 
-func (h mazeHandler) putPaths(ctx *fiber.Ctx) error {
-	var body struct {
-		Id    string      `json:"id"`
-		Paths []maze.Path `json:"paths"`
-	}
+func (h mazeHandler) deletePath(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
 
-	if err := ctx.BodyParser(&body); err != nil {
+	var path maze.Path
+	if err := ctx.BodyParser(&path); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	err := h.svc.PutPaths(ctx.Context(), body.Id, body.Paths)
+	err := h.svc.DeletePath(ctx.Context(), id, path)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -96,18 +94,35 @@ func (h mazeHandler) putPaths(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(http.StatusOK)
 }
 
-func (h mazeHandler) putQuadrants(ctx *fiber.Ctx) error {
+// UpdateMaze maze allows to:
+//	- Add/replace existing spots
+//	- Move quadrants by changing maze's center
+//	- Add paths
+func (h mazeHandler) putMaze(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+
 	var body struct {
-		Id         string          `json:"id"`
-		Coordinate maze.Coordinate `json:"coordinate"`
+		Center maze.Coordinate `json:"center"`
+		Spots  []maze.Spot     `json:"spots"`
+		Paths  []maze.Path     `json:"paths"`
 	}
 
 	if err := ctx.BodyParser(&body); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	err := h.svc.UpdateQuadrants(ctx.Context(), body.Id, body.Coordinate)
+	err := h.svc.Update(ctx.Context(), id, body.Center, body.Spots, body.Paths)
 	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return ctx.SendStatus(http.StatusOK)
+}
+
+func (h mazeHandler) deleteMaze(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+
+	if err := h.svc.Delete(ctx.Context(), id); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
