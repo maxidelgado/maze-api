@@ -28,13 +28,17 @@ func (h mazeHandler) setupRoutes() {
 }
 
 func (h mazeHandler) postMaze(ctx *fiber.Ctx) error {
-	var coordinate maze.Coordinate
+	var body struct {
+		Coordinate maze.Coordinate `json:"coordinate"`
+		Spots      []maze.Spot     `json:"spots"`
+		Paths      []maze.Path     `json:"paths"`
+	}
 
-	if err := ctx.BodyParser(&coordinate); err != nil {
+	if err := ctx.BodyParser(&body); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	id, err := h.svc.CreateMaze(ctx.Context(), coordinate)
+	id, err := h.svc.CreateMaze(ctx.Context(), body.Coordinate, body.Spots, body.Paths)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}

@@ -53,27 +53,22 @@ func (m *Maze) addSpot(spot Spot) {
 	isLeft := spot.Coordinate.X() <= quadrant.LimitX.Y()
 	isTop := spot.Coordinate.Y() >= quadrant.LimitY.X()
 
+	addSpotToQuadrant := func(index int) {
+		if m.Quadrants[index].Spots == nil {
+			m.Quadrants[index].Spots = make(map[string]Spot)
+		}
+		m.Quadrants[index].Spots[spot.Coordinate.Key()] = spot
+	}
+
 	switch {
 	case isTop && isLeft:
-		if m.Quadrants[TopLeftIndex].Spots == nil {
-			m.Quadrants[TopLeftIndex].Spots = make(map[string]Spot)
-		}
-		m.Quadrants[TopLeftIndex].Spots[spot.Coordinate.Key()] = spot
+		addSpotToQuadrant(TopLeftIndex)
 	case isTop && !isLeft:
-		if m.Quadrants[TopRightIndex].Spots == nil {
-			m.Quadrants[TopRightIndex].Spots = make(map[string]Spot)
-		}
-		m.Quadrants[TopRightIndex].Spots[spot.Coordinate.Key()] = spot
+		addSpotToQuadrant(TopRightIndex)
 	case !isTop && isLeft:
-		if m.Quadrants[BottomLeftIndex].Spots == nil {
-			m.Quadrants[BottomLeftIndex].Spots = make(map[string]Spot)
-		}
-		m.Quadrants[BottomLeftIndex].Spots[spot.Coordinate.Key()] = spot
+		addSpotToQuadrant(BottomLeftIndex)
 	case !isTop && !isLeft:
-		if m.Quadrants[BottomRightIndex].Spots == nil {
-			m.Quadrants[BottomRightIndex].Spots = make(map[string]Spot)
-		}
-		m.Quadrants[BottomRightIndex].Spots[spot.Coordinate.Key()] = spot
+		addSpotToQuadrant(BottomRightIndex)
 	}
 }
 
@@ -88,16 +83,26 @@ func (m *Maze) findSpot(coordinate Coordinate) bool {
 	return false
 }
 
-func (m *Maze) addPath(path Path) {
+func (m *Maze) addPath(path Path) bool {
 	if m.Paths == nil {
 		m.Paths = make(map[string]Path)
 	}
+
+	// check if both spots already exist in the maze
+	if !(m.findSpot(path.Edge[0]) && m.findSpot(path.Edge[1])) {
+		return false
+	}
+
+	// check if path already exist
 	_, ok := m.Paths[path.Key()]
 	if ok {
-		return
+		return true
 	}
+
+	// add a new path
 	path.calculateDistance()
 	m.Paths[path.Key()] = path
+	return true
 }
 
 func (m Maze) moveAxes(x, y int64) Maze {
@@ -125,24 +130,23 @@ type Quadrant struct {
 
 type Spot struct {
 	Id         string     `json:"id" bson:"_id"`
-	Coordinate Coordinate `json:"coordinate" bson:"coordinate"`
 	Name       string     `json:"name" bson:"name"`
-	Gold       int        `json:"gold" bson:"gold"`
+	Coordinate Coordinate `json:"coordinate" bson:"coordinate"`
+	GoldAmount int        `json:"gold_amount" bson:"gold_amount"`
 }
 
 type Path struct {
-	Source   Coordinate `json:"source" bson:"source"`
-	Target   Coordinate `json:"target" bson:"target"`
-	Distance float64    `json:"distance" bson:"distance"`
+	Edge     [2]Coordinate `json:"edge" bson:"edge"`
+	Distance float64       `json:"distance" bson:"distance"`
 }
 
 func (p Path) Key() string {
-	return p.Source.Key() + "-" + p.Target.Key()
+	return p.Edge[0].Key() + "-" + p.Edge[1].Key()
 }
 
 func (p *Path) calculateDistance() {
-	a := math.Pow(float64(p.Source.X()-p.Target.X()), 2)
-	b := math.Pow(float64(p.Source.Y()-p.Target.Y()), 2)
+	a := math.Pow(float64(p.Edge[0].X()-p.Edge[1].X()), 2)
+	b := math.Pow(float64(p.Edge[0].Y()-p.Edge[1].Y()), 2)
 	p.Distance = math.Sqrt(a + b)
 }
 

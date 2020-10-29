@@ -4,7 +4,7 @@ import "context"
 
 type Service interface {
 	GetMaze(context.Context, string) (Maze, error)
-	CreateMaze(context.Context, Coordinate) (string, error)
+	CreateMaze(context.Context, Coordinate, []Spot, []Path) (string, error)
 	UpdateQuadrants(context.Context, string, Coordinate) error
 	PutSpots(context.Context, string, []Spot) error
 	PutPaths(context.Context, string, []Path) error

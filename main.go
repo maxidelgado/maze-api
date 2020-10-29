@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/maxidelgado/maze-api/config"
 	"github.com/maxidelgado/maze-api/database"
 	"github.com/maxidelgado/maze-api/domain/maze"
@@ -13,7 +14,10 @@ import (
 func main() {
 	// setup router
 	app := fiber.New()
-	api := app.Group(config.BasePath)
+	app.Use(
+		recover.New(),
+	)
+	api := app.Group(config.Router.BasePath)
 
 	// setup repositories
 	db := database.New()
@@ -24,5 +28,5 @@ func main() {
 	// setup handlers
 	handlers.NewMaze(api, mazeSvc)
 
-	log.Fatal(app.Listen(config.Host))
+	log.Fatal(app.Listen(config.Router.Host))
 }
