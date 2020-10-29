@@ -2,8 +2,7 @@ package maze
 
 import (
 	"context"
-	"fmt"
-
+	"errors"
 	"github.com/google/uuid"
 )
 
@@ -32,7 +31,7 @@ func (s service) CreateMaze(ctx context.Context, center Coordinate, spots []Spot
 
 	for _, path := range paths {
 		if ok := maze.addPath(path); !ok {
-			fmt.Println("could not add edge, both spots should already exist")
+			return "", errors.New("could not add path, spot not found")
 		}
 	}
 
@@ -75,7 +74,7 @@ func (s service) PutPaths(ctx context.Context, mazeId string, paths []Path) erro
 
 	for _, path := range paths {
 		if ok := maze.addPath(path); !ok {
-			fmt.Println("could not add edge, both spots should already exist")
+			return errors.New("could not add path, spot not found")
 		}
 	}
 
