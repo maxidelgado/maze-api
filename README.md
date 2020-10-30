@@ -92,3 +92,5 @@ $ curl --location --request PUT 'localhost:3000/api/v1/games/7f2ced2a-9c4e-47d7-
 Repeat the last step until you arrived to the exit spot
 
 _Note: more examples about the other CRUD operations [here](example.rest)_
+
+_Note 2: unit testing has low coverage and was added as a demonstration_
