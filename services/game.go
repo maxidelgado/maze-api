@@ -1,33 +1,35 @@
-package game
+package services
 
 import (
 	"context"
 	"errors"
-	"github.com/google/uuid"
-	"github.com/maxidelgado/maze-api/domain/maze"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/maxidelgado/maze-api/domain/game"
+	"github.com/maxidelgado/maze-api/domain/maze"
 )
 
-func NewService(mazeSvc maze.Service, db DataBase) Service {
-	return &service{mazeSvc: mazeSvc, db: db}
+func NewGame(mazeSvc maze.Service, db game.DataBase) game.Service {
+	return &gameSvc{mazeSvc: mazeSvc, db: db}
 }
 
-type service struct {
+type gameSvc struct {
 	mazeSvc maze.Service
-	db      DataBase
+	db      game.DataBase
 }
 
-func (s service) Start(ctx context.Context, mazeId string) (Game, error) {
+func (s gameSvc) Start(ctx context.Context, mazeId string) (game.Game, error) {
 	// get the maze
 	m, err := s.mazeSvc.Get(ctx, mazeId)
 	if err != nil {
-		return Game{}, err
+		return game.Game{}, err
 	}
 
 	// validate if the maze is able to be played
 	valid, distance, entrance, exit := validateMaze(m)
 	if !valid {
-		return Game{}, errors.New("the selected Maze is not ready to be played")
+		return game.Game{}, errors.New("the selected Maze is not ready to be played")
 	}
 
 	// get the spots connected to the entrance spot
@@ -37,47 +39,47 @@ func (s service) Start(ctx context.Context, mazeId string) (Game, error) {
 		allowedMovements = append(allowedMovements, key)
 	}
 
-	game := Game{
+	g := game.Game{
 		Id:              uuid.New().String(),
 		Entrance:        entrance.Key(),
 		Exit:            exit.Key(),
 		MinimumDistance: distance,
 		Maze:            m,
 		StartDate:       time.Now(),
-		PlayerStats: PlayerStats{
+		PlayerStats: game.PlayerStats{
 			CurrentSpot:      entrance.Key(),
 			AllowedMovements: allowedMovements,
 		},
 	}
 
 	// persist the game
-	err = s.db.PutGame(ctx, game)
+	err = s.db.PutGame(ctx, g)
 	if err != nil {
-		return Game{}, err
+		return game.Game{}, err
 	}
 
-	return game, nil
+	return g, nil
 }
 
-func (s service) Get(ctx context.Context, gameId string) (Game, error) {
+func (s gameSvc) Get(ctx context.Context, gameId string) (game.Game, error) {
 	return s.db.GetGame(ctx, gameId)
 }
 
-func (s service) Move(ctx context.Context, gameId string, nextSpot string) (Game, error) {
+func (s gameSvc) Move(ctx context.Context, gameId string, nextSpot string) (game.Game, error) {
 	// get the current game
-	game, err := s.db.GetGame(ctx, gameId)
+	g, err := s.db.GetGame(ctx, gameId)
 	if err != nil {
-		return Game{}, err
+		return game.Game{}, err
 	}
 
 	// check if the game is already finished
-	if !game.EndDate.IsZero() {
-		return game, nil
+	if !g.EndDate.IsZero() {
+		return g, nil
 	}
 
 	// check if the selected spot is connected to the current one
 	var canMove bool
-	for _, allowedMovement := range game.PlayerStats.AllowedMovements {
+	for _, allowedMovement := range g.PlayerStats.AllowedMovements {
 		if nextSpot == allowedMovement {
 			canMove = true
 			break
@@ -87,34 +89,34 @@ func (s service) Move(ctx context.Context, gameId string, nextSpot string) (Game
 	switch {
 	case !canMove:
 		// if the selected spot is not connected to the current, return an error
-		return Game{}, errors.New("could not move to the selected spot")
-	case nextSpot == game.Exit:
+		return game.Game{}, errors.New("could not move to the selected spot")
+	case nextSpot == g.Exit:
 		// if the selected spot is the exit spot
-		game.EndDate = time.Now()
-		game.setAllowedMovements(nil)
+		g.EndDate = time.Now()
+		g.SetAllowedMovements(nil)
 	default:
 		// if the selected spot is not final and is valid
-		neighbours := game.Maze.GetNeighbours(nextSpot)
+		neighbours := g.Maze.GetNeighbours(nextSpot)
 		var movements []string
 		for key := range neighbours {
 			movements = append(movements, key)
 		}
-		game.setAllowedMovements(movements)
+		g.SetAllowedMovements(movements)
 	}
 
 	// ensure that we add gold only the first time
-	if !game.hasVisited(nextSpot) {
-		game.addGold(nextSpot)
+	if !g.HasVisited(nextSpot) {
+		g.AddGold(nextSpot)
 	}
 
-	game.move(nextSpot)
-	game.addDistance(nextSpot)
-	game.setCurrentSpot(nextSpot)
+	g.Move(nextSpot)
+	g.AddDistance(nextSpot)
+	g.SetCurrentSpot(nextSpot)
 
-	return game, s.db.UpdateGame(ctx, game)
+	return g, s.db.UpdateGame(ctx, g)
 }
 
-func (s service) Delete(ctx context.Context, gameId string) error {
+func (s gameSvc) Delete(ctx context.Context, gameId string) error {
 	return s.db.DeleteGame(ctx, gameId)
 }
 
@@ -126,9 +128,9 @@ func validateMaze(m maze.Maze) (valid bool, minDistance float64, entrance maze.C
 	for _, quadrant := range m.Quadrants {
 		for _, spot := range quadrant.Spots {
 			switch spot.Name {
-			case EntranceSpot:
+			case game.EntranceSpot:
 				entrance = spot.Coordinate
-			case ExitSpot:
+			case game.ExitSpot:
 				exit = spot.Coordinate
 			}
 		}

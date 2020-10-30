@@ -11,6 +11,13 @@ import (
 	"testing"
 )
 
+/*
+IMPORTANT: Just added some different kind of test in order to demonstrate the usage of Unit Test
+		   The purpose is NOT to achieve a high coverage percentage.
+
+		   In this case the important part is about the usage of the package http and fiber
+			to simulate HTTP calls to the API
+*/
 func Test_gamesHandler_postGame(t *testing.T) {
 	type fields struct {
 		svc game.Service

@@ -1,6 +1,6 @@
 package maze
 
-// create quadrants based on a given point (x,y)
+// Create quadrants based on a given central point (x,y)
 func createQuadrants(x, y int64) [4]Quadrant {
 	var quadrants [4]Quadrant
 	quadrants[TopLeftIndex] = Quadrant{
@@ -31,8 +31,12 @@ func createQuadrants(x, y int64) [4]Quadrant {
 	return quadrants
 }
 
+/*
+	Represents a quadrant in a cartesian plane, limited by two lines.
+	Is where spots are contained.
+*/
 type Quadrant struct {
-	Id     string          `json:"id" bson:"_id"`
+	Id     string          `json:"id" bson:"_id"` // is the name of the quadrant, like top-left
 	LimitX Coordinates     `json:"limit_x"`
 	LimitY Coordinates     `json:"limit_y"`
 	Spots  map[string]Spot `json:"spots"`

@@ -2,7 +2,7 @@ package maze
 
 import "fmt"
 
-// represents a point in a cartesian plane in the format [a,b]
+// Represents a point in a cartesian plane in the format [a,b]
 type Coordinates [2]int64
 
 func (c Coordinates) X() int64 {

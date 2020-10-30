@@ -30,6 +30,12 @@ func (h mazeHandler) setupRoutes() {
 	}
 }
 
+/*
+POST /api/v1/mazes :
+	Proceed to the creation of a new maze.
+	Optionally the client can set some spots, paths, and can change the initial
+	center of the maze (displaced quadrants).
+*/
 func (h mazeHandler) postMaze(ctx *fiber.Ctx) error {
 	var body struct {
 		Center maze.Coordinates `json:"center"`
@@ -49,6 +55,10 @@ func (h mazeHandler) postMaze(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{"maze_id": id})
 }
 
+/*
+GET /api/v1/mazes/{id} :
+	Returns a given maze.
+*/
 func (h mazeHandler) getMaze(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 	if id == "" {
@@ -63,6 +73,11 @@ func (h mazeHandler) getMaze(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(m)
 }
 
+/*
+DELETE /api/v1/mazes/{id}/spot :
+	Performs the deletion of a given spot from a maze.
+	IMPORTANT: will produce a cascade deletion of all the related paths.
+*/
 func (h mazeHandler) deleteSpot(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
@@ -79,6 +94,11 @@ func (h mazeHandler) deleteSpot(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(http.StatusOK)
 }
 
+/*
+DELETE /api/v1/mazes/{id}/path :
+	Performs the deletion of a given path from a maze.
+	IMPORTANT: as all the paths have the corresponding edge/reverse-edge pair, both will be deleted.
+*/
 func (h mazeHandler) deletePath(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
@@ -95,10 +115,13 @@ func (h mazeHandler) deletePath(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(http.StatusOK)
 }
 
-// UpdateMaze maze allows to:
-//	- Add/replace existing spots
-//	- Move quadrants by changing maze's center
-//	- Add paths
+/*
+PUT /api/v1/mazes/{id} :
+	Perform a maze updating. Allows the following update:
+		- Add/replace existing spots
+		- Move quadrants by changing maze's center
+		- Add paths
+*/
 func (h mazeHandler) putMaze(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
@@ -120,6 +143,10 @@ func (h mazeHandler) putMaze(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(http.StatusOK)
 }
 
+/*
+DELETE /api/v1/mazes/{id} :
+	Performs a hard delete for a given maze.
+*/
 func (h mazeHandler) deleteMaze(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 

@@ -8,6 +8,14 @@ import (
 	"testing"
 )
 
+/*
+IMPORTANT: Just added some different kind of test in order to demonstrate the usage of Unit Test
+		   The purpose is NOT to achieve a high coverage percentage.
+
+		   In this case the important part is about the isolation of an external package that does
+			not export any interface.
+*/
+
 func createMock(mock mgo.Mock) func(context.Context) mgo.Client {
 	return func(context.Context) mgo.Client {
 		return mock

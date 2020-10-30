@@ -1,14 +1,13 @@
 package main
 
 import (
-	"github.com/maxidelgado/maze-api/domain/game"
+	"github.com/maxidelgado/maze-api/services"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/maxidelgado/maze-api/config"
 	"github.com/maxidelgado/maze-api/database"
-	"github.com/maxidelgado/maze-api/domain/maze"
 	"github.com/maxidelgado/maze-api/handlers"
 )
 
@@ -24,8 +23,8 @@ func main() {
 	db := database.New()
 
 	// setup services
-	mazeSvc := maze.NewService(db)
-	gameSvc := game.NewService(mazeSvc, db)
+	mazeSvc := services.NewMaze(db)
+	gameSvc := services.NewGame(mazeSvc, db)
 
 	// setup handlers
 	handlers.NewMaze(api, mazeSvc)

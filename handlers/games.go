@@ -26,6 +26,12 @@ func (h gamesHandler) setupRoutes() {
 	}
 }
 
+/*
+POST /api/v1/games :
+	Starts a new game based on a given mazeId.
+	Validates that the maze is able to be played.
+	Returns all the required info to render the game on the client side.
+*/
 func (h gamesHandler) postGame(ctx *fiber.Ctx) error {
 	var body struct {
 		MazeId string `json:"maze_id"`
@@ -43,6 +49,10 @@ func (h gamesHandler) postGame(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(newGame)
 }
 
+/*
+GET /api/v1/games :
+	Returns an existing game
+*/
 func (h gamesHandler) getGame(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
@@ -54,6 +64,10 @@ func (h gamesHandler) getGame(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(response)
 }
 
+/*
+DELETE /api/v1/games :
+	Performs a hard delete to a given game
+*/
 func (h gamesHandler) deleteGame(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
@@ -65,6 +79,10 @@ func (h gamesHandler) deleteGame(ctx *fiber.Ctx) error {
 	return ctx.SendStatus(http.StatusOK)
 }
 
+/*
+PUT /api/v1/games/move :
+	Performs a movement to a given spot (if valid).
+*/
 func (h gamesHandler) putMove(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 

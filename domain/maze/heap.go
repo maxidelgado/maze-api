@@ -1,7 +1,9 @@
 package maze
 
-// the purpose of this min-heap is to keep the min value in each iteration, in order to find the
-// minimum distance between two spots
+/*
+	The purpose of this min-heap is to keep the min value in each iteration, in order to find the
+	minimum distance between two spots
+*/
 
 import hp "container/heap"
 
