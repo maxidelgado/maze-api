@@ -102,9 +102,13 @@ func (s service) Move(ctx context.Context, gameId string, nextSpot string) (Game
 		game.setAllowedMovements(movements)
 	}
 
+	// ensure that we add gold only the first time
+	if !game.hasVisited(nextSpot) {
+		game.addGold(nextSpot)
+	}
+
 	game.move(nextSpot)
 	game.addDistance(nextSpot)
-	game.addGold(nextSpot)
 	game.setCurrentSpot(nextSpot)
 
 	return game, s.db.UpdateGame(ctx, game)

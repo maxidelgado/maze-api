@@ -47,6 +47,16 @@ func (g *Game) setAllowedMovements(movements []string) {
 	g.PlayerStats.AllowedMovements = movements
 }
 
+func (g *Game) hasVisited(spot string) bool {
+	for _, movement := range g.PlayerStats.Movements {
+		if movement.From == spot || movement.To == spot {
+			return true
+		}
+	}
+
+	return false
+}
+
 type Movement struct {
 	Date time.Time `json:"date"`
 	From string    `json:"from"`
