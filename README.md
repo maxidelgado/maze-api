@@ -11,17 +11,14 @@ Just run the following command
 $ docker-compose up -d
 ```
 
-You can try changing the initial availability variable in docker-compose.yml, so you can check for different stock configurations
-
 Note: to clear the database, you can run:
 ```sh
-$ docker-compose down
-$ docker-compose up -d
+$ docker-compose restart
 ```
 
 ### How to test
 
-First you need to a maze as follows:
+First you need to create a maze as follows:
 ```sh 
 $ curl --location --request POST 'localhost:3000/api/v1/mazes' \
   --header 'Content-Type: application/json' \
@@ -50,8 +47,10 @@ $ curl --location --request POST 'localhost:3000/api/v1/mazes' \
       ]
   }'
 ```
+_IMPORTANT: playable maze must contain an entrance and exit spots, and they both
+must be connected by any path_
 
-Then, you can start a new game by using the maze_id, returned from the previous call:
+Then, you can start a new game by using the maze_id, returned from the previous request:
 ```sh 
 $ curl --location --request POST 'localhost:3000/api/v1/games' \
   --header 'Content-Type: application/json' \
