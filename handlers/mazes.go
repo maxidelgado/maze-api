@@ -1,9 +1,10 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/maxidelgado/maze-api/domain/maze"
-	"net/http"
 )
 
 func NewMaze(router fiber.Router, svc maze.Service) {
@@ -31,9 +32,9 @@ func (h mazeHandler) setupRoutes() {
 
 func (h mazeHandler) postMaze(ctx *fiber.Ctx) error {
 	var body struct {
-		Center maze.Coordinate `json:"center"`
-		Spots  []maze.Spot     `json:"spots"`
-		Paths  []maze.Path     `json:"paths"`
+		Center maze.Coordinates `json:"center"`
+		Spots  []maze.Spot      `json:"spots"`
+		Paths  []maze.Path      `json:"paths"`
 	}
 
 	if err := ctx.BodyParser(&body); err != nil {
@@ -65,7 +66,7 @@ func (h mazeHandler) getMaze(ctx *fiber.Ctx) error {
 func (h mazeHandler) deleteSpot(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
-	var coordinate maze.Coordinate
+	var coordinate maze.Coordinates
 	if err := ctx.BodyParser(&coordinate); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -102,9 +103,9 @@ func (h mazeHandler) putMaze(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
 	var body struct {
-		Center maze.Coordinate `json:"center"`
-		Spots  []maze.Spot     `json:"spots"`
-		Paths  []maze.Path     `json:"paths"`
+		Center maze.Coordinates `json:"center"`
+		Spots  []maze.Spot      `json:"spots"`
+		Paths  []maze.Path      `json:"paths"`
 	}
 
 	if err := ctx.BodyParser(&body); err != nil {

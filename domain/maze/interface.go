@@ -6,11 +6,11 @@ import (
 
 type Service interface {
 	Get(context.Context, string) (Maze, error)
-	Create(context.Context, Coordinate, []Spot, []Path) (string, error)
-	Update(context.Context, string, Coordinate, []Spot, []Path) error
+	Create(context.Context, Coordinates, []Spot, []Path) (string, error)
+	Update(context.Context, string, Coordinates, []Spot, []Path) error
 	Delete(context.Context, string) error
 
-	DeleteSpot(context.Context, string, Coordinate) error
+	DeleteSpot(context.Context, string, Coordinates) error
 	DeletePath(context.Context, string, Path) error
 }
 
@@ -19,6 +19,4 @@ type DataBase interface {
 	PutMaze(context.Context, Maze) error
 	UpdateMaze(context.Context, Maze) error
 	DeleteMaze(context.Context, string) error
-
-	DeleteSpot(context.Context, string, string, Coordinate) error
 }

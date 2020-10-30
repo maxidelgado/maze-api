@@ -16,9 +16,10 @@ func init() {
 	}
 
 	DB = MongoDB{
-		Uri:        fmt.Sprintf(mgoUriPattern, dbUser, dbPwd, dbHost),
-		Database:   getEnv("DB_NAME", "maze"),
-		Collection: getEnv("DB_COL", "mazes"),
+		Uri:            fmt.Sprintf(mgoUriPattern, dbUser, dbPwd, dbHost),
+		Database:       getEnv("DB_NAME", "maze"),
+		MazeCollection: getEnv("DB_MAZE_COL", "mazes"),
+		GameCollection: getEnv("DB_GAME_COL", "games"),
 	}
 }
 
@@ -32,9 +33,10 @@ var (
 )
 
 type MongoDB struct {
-	Uri        string
-	Database   string
-	Collection string
+	Uri            string
+	Database       string
+	MazeCollection string
+	GameCollection string
 }
 
 type RouterCfg struct {

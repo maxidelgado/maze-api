@@ -29,7 +29,8 @@ services:
       ROUTER_HOST: :3000
       BASE_PATH: /api/v1
       DB_NAME: maze
-      DB_COL: mazes
+      DB_MAZE_COL: mazes
+      DB_GAME_COL: games
       DB_HOST: mongo:27017
     ports:
       - 3000:3000

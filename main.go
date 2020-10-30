@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/maxidelgado/maze-api/domain/game"
 	"log"
 
 	"github.com/gofiber/fiber/v2"
@@ -23,10 +24,12 @@ func main() {
 	db := database.New()
 
 	// setup services
-	mazeSvc := maze.New(db)
+	mazeSvc := maze.NewService(db)
+	gameSvc := game.NewService(mazeSvc, db)
 
 	// setup handlers
 	handlers.NewMaze(api, mazeSvc)
+	handlers.NewGames(api, gameSvc)
 
 	log.Fatal(app.Listen(config.Router.Host))
 }
