@@ -1,154 +1,106 @@
+### GET A GAME DETAIL
+GET localhost:3000/api/v1/games/7f2ced2a-9c4e-47d7-b9fd-19c6c5518d5a
+
+### MOVE TO A GIVEN SPOT
+POST localhost:3000/api/v1/games/7f2ced2a-9c4e-47d7-b9fd-19c6c5518d5a/move
+Content-Type: application/json
+
+{
+    "spot": "[-1,2]"
+}
+
+### DELETE A GAME
+DELETE localhost:3000/api/v1/games/17b11a39-a969-4f0a-bf31-4af77a959cc4
+Content-Type: application/json
+
+### START A NEW GAME
+POST localhost:3000/api/v1/games
+Content-Type: application/json
+
+{
+    "maze_id": "2c46dc7e-3841-4da7-a2ad-f34a689fe305"
+}
+
+### DELETE A PATH FROM A GIVEN MAZE
+DELETE localhost:3000/api/v1/mazes/03d79a2c-0b34-458e-926d-9c9c596c2413/path
+Content-Type: application/json
+
+{
+    "origin": [-1,1],
+    "destiny": [-1,-1]
+}
+
+### DELETE A SPOT FROM A GIVEN MAZE
+DELETE localhost:3000/api/v1/mazes/03d79a2c-0b34-458e-926d-9c9c596c2413/spot
+Content-Type: application/json
+
+[1,1]
+
+### DELETE A MAZE
+DELETE localhost:3000/api/v1/mazes/996d6c15-a526-4056-b3b6-5848dcd7e99d
+
+### UPDATE MAZE
+PUT localhost:3000/api/v1/mazes/03d79a2c-0b34-458e-926d-9c9c596c2413
+Content-Type: application/json
+
+{
+    "center": [0,0],
+    "spots": [
+        {
+            "name": "another spot",
+            "gold_amount": 0,
+            "coordinate": [2,2]
+        }
+    ],
+    "paths": [
+         {
+            "origin": [1,1],
+            "destiny": [2,2]
+        }
+    ]
+}
+
+### GET MAZE BY ID
+GET localhost:3000/api/v1/mazes/03d79a2c-0b34-458e-926d-9c9c596c2413
+
+### CREATE MAZE
 POST localhost:3000/api/v1/mazes
 Content-Type: application/json
 
 {
-  "center": [
-    0,
-    0
-  ],
-  "spots": [
-    {
-      "name": "entrance",
-      "gold_amount": 0,
-      "coordinate": [
-        1,
-        1
-      ]
-    },
-    {
-      "name": "treasure room",
-      "gold_amount": 10,
-      "coordinate": [
-        1,
-        -1
-      ]
-    },
-    {
-      "name": "trap",
-      "gold_amount": -5,
-      "coordinate": [
-        -1,
-        -1
-      ]
-    },
-    {
-      "name": "exit",
-      "gold_amount": 50,
-      "coordinate": [
-        -1,
-        1
-      ]
-    }
-  ],
-  "paths": [
-    {
-      "edge": [
-        [
-          1,
-          1
-        ],
-        [
-          1,
-          -1
-        ]
-      ]
-    },
-    {
-      "edge": [
-        [
-          1,
-          -1
-        ],
-        [
-          -1,
-          -1
-        ]
-      ]
-    },
-    {
-      "edge": [
-        [
-          -1,
-          -1
-        ],
-        [
-          -1,
-          1
-        ]
-      ]
-    }
-  ]
-}
-
-###
-
-PUT localhost:3000/api/v1/mazes/0a0abf75-e757-46ca-8073-9bef771da5ae
-Content-Type: application/json
-
-{
-  "center": [
-    0,
-    0
-  ],
-  "spots": [
-    {
-      "name": "another spot",
-      "gold_amount": 0,
-      "coordinate": [
-        2,
-        2
-      ]
-    }
-  ],
-  "paths": [
-    {
-      "edge": [
-        [
-          1,
-          1
-        ],
-        [
-          2,
-          2
-        ]
-      ]
-    }
-  ]
-}
-
-###
-
-GET localhost:3000/api/v1/mazes/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88
-
-###
-
-
-DELETE localhost:3000/api/v1/mazes/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88/path
-Content-Type: application/json
-
-{
-  "edge": [
-    [
-      -1,
-      -1
+    "center": [
+        0,
+        0
     ],
-    [
-      -1,
-      1
+    "spots": [
+        {
+            "name": "entrance",
+            "gold_amount": 0,
+            "coordinate": [1,1]
+        },
+        {
+            "name": "treasure room",
+            "gold_amount": 10,
+            "coordinate": [1,-1]
+        },
+        {
+            "name": "another room",
+            "gold_amount": 0,
+            "coordinate": [-1,-1]
+        },
+        {
+            "name": "exit",
+            "gold_amount": 50,
+            "coordinate": [-1,1]
+        }
+    ],
+    "paths": [
+        {
+            "origin": [1,1],
+            "destiny": [1,-1]
+        }
     ]
-  ]
 }
 
 ###
 
-DELETE localhost:3000/api/v1/mazes/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88/spot
-Content-Type: application/json
-
-[
-  1,
-  1
-]
-
-###
-
-DELETE localhost:3000/api/v1/mazes/5fe2cd04-2ee7-4c7b-981b-5ffea9b83e88

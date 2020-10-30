@@ -139,8 +139,8 @@ func (m *Maze) GetNeighbours(origin string) map[string]float64 {
 	return m.Paths[origin]
 }
 
-// uses the Dijkstra algorithm to verify if two spots are already connected through any path,
-// and returns the distance between them and the complete path
+// uses the Dijkstra algorithm to verify if two spots are already connected through any path.
+// Returns the distance between them and the complete path
 func (m *Maze) GetPath(origin, destiny string) (float64, []string) {
 	h := newHeap()
 	h.push(path{value: 0, nodes: []string{origin}})
