@@ -104,8 +104,12 @@ func (m *Maze) addPath(origin, destiny Coordinates) bool {
 	if m.Paths[origin.Key()] == nil {
 		m.Paths[origin.Key()] = map[string]float64{}
 	}
+	if m.Paths[destiny.Key()] == nil {
+		m.Paths[destiny.Key()] = map[string]float64{}
+	}
 
 	m.Paths.appendPath(origin, destiny)
+	m.Paths.appendPath(destiny, origin)
 	return true
 }
 
