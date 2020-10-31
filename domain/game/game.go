@@ -6,21 +6,28 @@ import (
 	"github.com/maxidelgado/maze-api/domain/maze"
 )
 
-const (
-	EntranceSpot = "entrance"
-	ExitSpot     = "exit"
-)
+/*
+	Represents an in-progress game
 
-// Represents an in-progress game
+	Note:
+	To avoid a potential inconsistency issue between the current game and the maze, I decided to
+	 copy the maze. We sacrifice storage space, but we can ensure that the consistency will be maintained across the entire
+	 duration of the game. On the other hand we avoid multiple database calls to perform a join.
+
+	Other possible solution could be to lock the maze while it is being used by any in-progress game, but we will be
+	 permanently unable to update the maze if some game remains in-progress forever.
+*/
 type Game struct {
 	Id              string      `json:"id" bson:"_id"`
-	Entrance        string      `json:"entrance"`
-	Exit            string      `json:"exit"`
+	Name            string      `json:"name"`
 	MinimumDistance float64     `json:"minimum_distance"`
 	PlayerStats     PlayerStats `json:"player_stats"`
-	Maze            maze.Maze   `json:"-"`
 	StartDate       time.Time   `json:"start_date"`
 	EndDate         time.Time   `json:"end_date,omitempty"`
+	OptimumPath     []string    `json:"optimum_path,omitempty"` // should be displayed only when the game is finished
+
+	// internal usage only
+	Maze maze.Maze `json:"-"`
 }
 
 // Performs a movement to the spot selected by the player
@@ -76,6 +83,6 @@ type PlayerStats struct {
 	TotalGold        int        `json:"total_gold"`
 	DistanceCovered  float64    `json:"distance_covered"`
 	CurrentSpot      string     `json:"current_spot"`
-	Movements        []Movement `json:"movements"`
-	AllowedMovements []string   `json:"allowed_movements"`
+	Movements        []Movement `json:"movements,omitempty"`
+	AllowedMovements []string   `json:"allowed_movements,omitempty"`
 }

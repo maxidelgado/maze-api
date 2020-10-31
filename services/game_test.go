@@ -106,7 +106,7 @@ func Test_service_Move(t *testing.T) {
 				},
 				db: dbMock{
 					get: func(ctx context.Context, s string) (game.Game, error) {
-						return game.Game{Exit: "[1,1]", PlayerStats: game.PlayerStats{AllowedMovements: []string{"[1,1]"}}}, nil
+						return game.Game{PlayerStats: game.PlayerStats{AllowedMovements: []string{"[1,1]"}}}, nil
 					},
 					update: func(ctx context.Context, g game.Game) error {
 						return nil
@@ -163,12 +163,12 @@ func Test_service_Move(t *testing.T) {
 				gameId:   "id",
 				nextSpot: "[1,1]",
 			},
-			wantErr: false,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := mazeSvc{
+			s := gameSvc{
 				mazeSvc: tt.fields.mazeSvc,
 				db:      tt.fields.db,
 			}

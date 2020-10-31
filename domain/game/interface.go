@@ -5,7 +5,7 @@ import (
 )
 
 type Service interface {
-	Start(context.Context, string) (Game, error)
+	Start(context.Context, string, string) (Game, error)
 	Get(context.Context, string) (Game, error)
 	Move(context.Context, string, string) (Game, error)
 	Delete(context.Context, string) error

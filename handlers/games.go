@@ -35,13 +35,14 @@ POST /api/v1/games :
 func (h gamesHandler) postGame(ctx *fiber.Ctx) error {
 	var body struct {
 		MazeId string `json:"maze_id"`
+		Name   string `json:"name"`
 	}
 
 	if err := ctx.BodyParser(&body); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	newGame, err := h.svc.Start(ctx.Context(), body.MazeId)
+	newGame, err := h.svc.Start(ctx.Context(), body.MazeId, body.Name)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}

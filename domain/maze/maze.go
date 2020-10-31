@@ -1,6 +1,7 @@
 package maze
 
 import (
+	"errors"
 	"math"
 )
 
@@ -20,6 +21,8 @@ const (
 
 type Maze struct {
 	Id        string      `json:"id" bson:"_id"`
+	Entrance  string      `json:"-"`
+	Exit      string      `json:"-"`
 	Quadrants [4]Quadrant `json:"quadrants"`
 	Paths     PathsIndex  `json:"paths"`
 }
@@ -58,9 +61,23 @@ func (m *Maze) getCoordinateQuadrant(coordinate Coordinates) (id string, index i
 }
 
 // Add a spot to the corresponding quadrant in a maze
-func (m *Maze) AddSpot(spot Spot) {
+func (m *Maze) AddSpot(spot Spot) error {
+	switch spot.Name {
+	case EntranceSpot:
+		if m.Entrance != "" {
+			return errors.New("multiple entrance spots not allowed")
+		}
+		m.Entrance = spot.Coordinate.Key()
+	case ExitSpot:
+		if m.Exit != "" {
+			return errors.New("multiple exit spots not allowed")
+		}
+		m.Exit = spot.Coordinate.Key()
+	}
+
 	_, index := m.getCoordinateQuadrant(spot.Coordinate)
 	m.Quadrants[index].Spots[spot.Coordinate.Key()] = spot
+	return nil
 }
 
 // Delete a spot from the maze and produces a cascade deleting of all the related paths to avoid orphan paths
@@ -123,7 +140,7 @@ func (m *Maze) MoveAxes(x, y int64) Maze {
 
 	for _, quadrant := range m.Quadrants {
 		for _, spot := range quadrant.Spots {
-			maze.AddSpot(spot)
+			_ = maze.AddSpot(spot)
 		}
 	}
 

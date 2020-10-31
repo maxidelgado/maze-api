@@ -31,7 +31,9 @@ func (s mazeSvc) Create(ctx context.Context, center maze.Coordinates, spots []ma
 
 	// Add spots taking care of the corresponding quadrant for every spot
 	for _, spot := range spots {
-		m.AddSpot(spot)
+		if err := m.AddSpot(spot); err != nil {
+			return "", err
+		}
 	}
 
 	// Add paths to the maze taking care about source/target spots exist (fail if try to create orphan path)
@@ -63,7 +65,9 @@ func (s mazeSvc) Update(ctx context.Context, mazeId string, center maze.Coordina
 	// check if should add new spots
 	if len(spots) != 0 {
 		for _, spot := range spots {
-			m.AddSpot(spot)
+			if err := m.AddSpot(spot); err != nil {
+				return err
+			}
 		}
 	}
 

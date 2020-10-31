@@ -19,7 +19,11 @@ type gameSvc struct {
 	db      game.DataBase
 }
 
-func (s gameSvc) Start(ctx context.Context, mazeId string) (game.Game, error) {
+func (s gameSvc) Start(ctx context.Context, mazeId, name string) (game.Game, error) {
+	if name == "" {
+		return game.Game{}, errors.New("game name must be provided")
+	}
+
 	// get the maze
 	m, err := s.mazeSvc.Get(ctx, mazeId)
 	if err != nil {
@@ -27,13 +31,13 @@ func (s gameSvc) Start(ctx context.Context, mazeId string) (game.Game, error) {
 	}
 
 	// validate if the maze is able to be played
-	valid, distance, entrance, exit := validateMaze(m)
+	valid, distance, entrance, _ := validateMaze(m)
 	if !valid {
 		return game.Game{}, errors.New("the selected Maze is not ready to be played")
 	}
 
 	// get the spots connected to the entrance spot
-	neighbours := m.GetNeighbours(entrance.Key())
+	neighbours := m.GetNeighbours(entrance)
 	var allowedMovements []string
 	for key := range neighbours {
 		allowedMovements = append(allowedMovements, key)
@@ -41,13 +45,12 @@ func (s gameSvc) Start(ctx context.Context, mazeId string) (game.Game, error) {
 
 	g := game.Game{
 		Id:              uuid.New().String(),
-		Entrance:        entrance.Key(),
-		Exit:            exit.Key(),
+		Name:            name,
 		MinimumDistance: distance,
 		Maze:            m,
 		StartDate:       time.Now(),
 		PlayerStats: game.PlayerStats{
-			CurrentSpot:      entrance.Key(),
+			CurrentSpot:      entrance,
 			AllowedMovements: allowedMovements,
 		},
 	}
@@ -90,10 +93,11 @@ func (s gameSvc) Move(ctx context.Context, gameId string, nextSpot string) (game
 	case !canMove:
 		// if the selected spot is not connected to the current, return an error
 		return game.Game{}, errors.New("could not move to the selected spot")
-	case nextSpot == g.Exit:
+	case nextSpot == g.Maze.Exit:
 		// if the selected spot is the exit spot
 		g.EndDate = time.Now()
 		g.SetAllowedMovements(nil)
+		_, g.OptimumPath = g.Maze.GetPath(g.Maze.Entrance, g.Maze.Exit)
 	default:
 		// if the selected spot is not final and is valid
 		neighbours := g.Maze.GetNeighbours(nextSpot)
@@ -124,19 +128,24 @@ func (s gameSvc) Delete(ctx context.Context, gameId string) error {
 // 	- has entrance and exit spots
 //	- both entrance and exit are connected
 //	- return the minimum distance required to end the game
-func validateMaze(m maze.Maze) (valid bool, minDistance float64, entrance maze.Coordinates, exit maze.Coordinates) {
-	for _, quadrant := range m.Quadrants {
-		for _, spot := range quadrant.Spots {
-			switch spot.Name {
-			case game.EntranceSpot:
-				entrance = spot.Coordinate
-			case game.ExitSpot:
-				exit = spot.Coordinate
-			}
-		}
+func validateMaze(m maze.Maze) (valid bool, minDistance float64, entrance, exit string) {
+	if m.Entrance == "" || m.Exit == "" {
+		return
 	}
 
-	minDistance, _ = m.GetPath(entrance.Key(), exit.Key())
+	entranceSpot, found := m.FindSpot(m.Entrance)
+	if !found {
+		return
+	}
+
+	exitSpot, found := m.FindSpot(m.Exit)
+	if !found {
+		return
+	}
+
+	minDistance, _ = m.GetPath(m.Entrance, m.Exit)
 	valid = minDistance > 0
+	entrance = entranceSpot.Coordinate.Key()
+	exit = exitSpot.Coordinate.Key()
 	return
 }
