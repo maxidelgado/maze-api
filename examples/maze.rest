@@ -1,0 +1,172 @@
+# curl --location --request DELETE 'localhost:3000/api/v1/mazes/96d9a144-ac8d-497c-bc5a-248012d7687d'
+DELETE localhost:3000/api/v1/mazes/96d9a144-ac8d-497c-bc5a-248012d7687d
+
+###
+
+
+DELETE localhost:3000/api/v1/mazes/96d9a144-ac8d-497c-bc5a-248012d7687d/path
+Content-Type: application/json
+
+{
+    "origin": [-1,1],
+    "destiny": [-1,-1]
+}
+
+###
+
+DELETE localhost:3000/api/v1/mazes/96d9a144-ac8d-497c-bc5a-248012d7687d/spot
+Content-Type: application/json
+
+[1,1]
+
+###
+
+PUT localhost:3000/api/v1/mazes/96d9a144-ac8d-497c-bc5a-248012d7687d
+Content-Type: application/json
+
+{
+    "center": [-1,4],
+    "spots": [
+        {
+            "name": "another spot",
+            "gold_amount": 0,
+            "coordinate": [2,-2]
+        }
+    ],
+    "paths": [
+         {
+            "origin": [1,1],
+            "destiny": [2,-2]
+        }
+    ]
+}
+
+###
+
+GET localhost:3000/api/v1/mazes/96d9a144-ac8d-497c-bc5a-248012d7687d
+
+###
+
+POST localhost:3000/api/v1/mazes
+Content-Type: application/json
+
+{
+    "name": "amazing maze",
+    "center": [
+        2,
+        1
+    ],
+    "spots": [
+        {
+            "name": "entrance",
+            "gold_amount": 0,
+            "coordinate": [
+                1,
+                1
+            ]
+        },
+        {
+            "name": "spot 1",
+            "gold_amount": 1,
+            "coordinate": [
+                1,
+                -1
+            ]
+        },
+        {
+            "name": "spot 2",
+            "gold_amount": 2,
+            "coordinate": [
+                9,
+                2
+            ]
+        },
+        {
+            "name": "spot 3",
+            "gold_amount": 3,
+            "coordinate": [
+                -7,
+                5
+            ]
+        },
+        {
+            "name": "spot 4",
+            "gold_amount": 3,
+            "coordinate": [
+                -7,
+                -5
+            ]
+        },
+        {
+            "name": "treasure room",
+            "gold_amount": 10,
+            "coordinate": [
+                -2,
+                4
+            ]
+        },
+        {
+            "name": "exit",
+            "gold_amount": 50,
+            "coordinate": [
+                -3,
+                -9
+            ]
+        }
+    ],
+    "paths": [
+        {
+            "origin": [
+                1,
+                1
+            ],
+            "destiny": [
+                1,
+                -1
+            ]
+        },
+        {
+            "origin": [
+                1,
+                1
+            ],
+            "destiny": [
+                9,
+                2
+            ]
+        },
+        {
+            "origin": [
+                1,
+                1
+            ],
+            "destiny": [
+                -7,
+                5
+            ]
+        },
+        {
+            "origin": [
+                -7,
+                5
+            ],
+            "destiny": [
+                -7,
+                -5
+            ]
+        },
+        {
+            "origin": [
+                -7,
+                -5
+            ],
+            "destiny": [
+                -3,
+                -9
+            ]
+        }
+    ]
+}
+
+###
+

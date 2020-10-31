@@ -16,13 +16,14 @@ type mazeSvc struct {
 	db maze.DataBase
 }
 
-func (s mazeSvc) Get(ctx context.Context, mazeId string) (maze.Maze, error) {
-	return s.db.GetMaze(ctx, mazeId)
-}
+func (s mazeSvc) Create(ctx context.Context, name string, center maze.Coordinates, spots []maze.Spot, paths []maze.Path) (string, error) {
+	if name == "" {
+		return "", errors.New("name is required")
+	}
 
-func (s mazeSvc) Create(ctx context.Context, center maze.Coordinates, spots []maze.Spot, paths []maze.Path) (string, error) {
 	m := maze.Maze{
 		Id:    uuid.New().String(),
+		Name:  name,
 		Paths: map[string]map[string]float64{},
 	}
 
@@ -114,4 +115,12 @@ func (s mazeSvc) DeletePath(ctx context.Context, mazeId string, path maze.Path) 
 	m.Paths.DeletePath(path.Origin, path.Destiny)
 
 	return s.db.UpdateMaze(ctx, m)
+}
+
+func (s mazeSvc) Query(ctx context.Context, name string) ([]maze.Maze, error) {
+	return s.db.QueryMaze(ctx, name)
+}
+
+func (s mazeSvc) Get(ctx context.Context, mazeId string) (maze.Maze, error) {
+	return s.db.GetMaze(ctx, mazeId)
 }

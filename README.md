@@ -7,27 +7,30 @@ the endpoints to start a game and move around an existing maze, until you arrive
 
 Just run the following command
 
-```sh
+```bash
 $ docker-compose up -d
 ```
 
 Note: to clear the database, you can run:
-```sh
+```bash
 $ docker-compose restart
 ```
 
-### How to test
+### How to use
 
-First you need to create a maze as follows:
-```sh 
+#### Create a maze
+
+You can create a maze as follows:
+```bash 
 $ curl --location --request POST 'localhost:3000/api/v1/mazes' \
   --header 'Content-Type: application/json' \
   --data-raw '{
-      "center": [
+      "name": "amazing maze",
+      "center": [ // Optional
           0,
           0
       ],
-      "spots": [
+      "spots": [ // Optional
           {
               "name": "entrance",
               "gold_amount": 0,
@@ -39,7 +42,7 @@ $ curl --location --request POST 'localhost:3000/api/v1/mazes' \
               "coordinate": [-1,1]
           }
       ],
-      "paths": [
+      "paths": [ // Optional
           {
               "origin": [1,1],
               "destiny": [-1,1]
@@ -47,50 +50,152 @@ $ curl --location --request POST 'localhost:3000/api/v1/mazes' \
       ]
   }'
 ```
-_IMPORTANT: playable maze must contain an entrance and exit spots, and they both
+_IMPORTANT: a playable maze must contain an entrance and exit spots, and they both
 must be connected by any path_
 
-Then, you can start a new game by using the maze_id, returned from the previous request:
-```sh 
-$ curl --location --request POST 'localhost:3000/api/v1/games' \
+#### Update a maze
+
+You can:
+    - Move quadrants
+    - Add spots
+    - Add paths
+    
+```bash
+$ curl --location --request PUT 'localhost:3000/api/v1/mazes/96d9a144-ac8d-497c-bc5a-248012d7687d' \
   --header 'Content-Type: application/json' \
   --data-raw '{
-      "maze_id": "17b11a39-a969-4f0a-bf31-4af77a959cc4"
+      "center": [-1,4],
+      "spots": [
+          {
+              "name": "another spot",
+              "gold_amount": 0,
+              "coordinate": [2,-2]
+          }
+      ],
+      "paths": [
+           {
+              "origin": [1,1],
+              "destiny": [2,-2]
+          }
+      ]
   }'
 ```
 
-Now you can start moving around the maze based on the game info, for example:
+#### Get an existing maze
+
+If you want to get maze details, you can get it by an id or by using the name:
+
+By id:
+```bash
+$ curl --location --request GET 'localhost:3000/api/v1/mazes/96d9a144-ac8d-497c-bc5a-248012d7687d'
+```
+
+By name: (will return any maze matching the name)
+```bash
+$ curl --location --request GET 'localhost:3000/api/v1/mazes?name=test'
+```
+
+#### Delete a maze
+
+```bash
+$ curl --location --request DELETE 'localhost:3000/api/v1/mazes/96d9a144-ac8d-497c-bc5a-248012d7687d'
+```
+
+#### Delete a spot or a path
+
+Delete spot:
+```bash
+$ curl --location --request DELETE 'localhost:3000/api/v1/mazes/96d9a144-ac8d-497c-bc5a-248012d7687d/spot' \
+--header 'Content-Type: application/json' \
+--data-raw '[1,1]'
+```
+
+Delete path:
+```bash
+$ curl --location --request DELETE 'localhost:3000/api/v1/mazes/96d9a144-ac8d-497c-bc5a-248012d7687d/path' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+      "origin": [-1,1],
+      "destiny": [-1,-1]
+  }'
+```
+
+#### Create a game
+
+You can create a new game by providing the id of the selected maze, and the name of the game:
+
+```bash
+$ curl --location --request POST 'localhost:3000/api/v1/games' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "maze_id": "2b267c65-107a-42e2-8343-b9a53dcd8492",
+    "name": "amazing game"
+}'
+```
+
+You will be positioned at the entrance of the maze, so you can start moving from here by using the "allowed_movements" field. For example:
 ```json
 {
-    "id": "7f2ced2a-9c4e-47d7-b9fd-19c6c5518d5a",
-    "entrance": "[1,1]",
-    "exit": "[-1,1]",
-    "minimum_distance": 6,
+    "id": "a4b4abde-ac4a-4ce6-a1c9-e66cd7717b54",
+    "name": "test 2",
+    "minimum_distance": 24.60112615949154,
     "player_stats": {
         "total_gold": 0,
         "distance_covered": 0,
         "current_spot": "[1,1]",
-        "movements": null,
         "allowed_movements": [
-            "[1,-1]"
+            {
+                "key": "[1,-1]",
+                "name": "spot 1"
+            },
+            {
+                "key": "[9,2]",
+                "name": "spot 2"
+            },
+            {
+                "key": "[-7,5]",
+                "name": "spot 3"
+            }
         ]
     },
-    "start_date": "2020-10-30T00:14:10.984025909-03:00",
+    "start_date": "2020-10-31T00:18:06.392391141-03:00",
     "end_date": "0001-01-01T00:00:00Z"
 }
 ```
+So you can move to (1,-1), (9,2) and (-7,5)
 
-You should use the "allowed_movements" field to perform your next movement around the maze, for example:
-```sh
-$ curl --location --request PUT 'localhost:3000/api/v1/games/7f2ced2a-9c4e-47d7-b9fd-19c6c5518d5a/move' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "spot": "[1,-1]"
-}'
+#### Moving
+
+You can perform a movement to the next spot as follows:
+```bash
+$ curl --location --request PUT 'localhost:3000/api/v1/games/a4b4abde-ac4a-4ce6-a1c9-e66cd7717b54/move' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+      "spot": "[9,2]"
+  }'
+```
+From here you should repeat until you arrive to the "exit" spot.
+
+#### Delete a game
+
+```bash
+$ curl --location --request DELETE 'localhost:3000/api/v1/games/96d9a144-ac8d-497c-bc5a-248012d7687d'
 ```
 
-Repeat the last step until you arrived to the exit spot
+#### Get a game
 
-_Note: more examples about the other CRUD operations [here](example.rest)_
+If you want to get game details, you can get it by an id or by using the name:
+
+By id:
+```bash
+$ curl --location --request GET 'localhost:3000/api/v1/games/96d9a144-ac8d-497c-bc5a-248012d7687d'
+```
+
+By name: (will return any game matching the name)
+```bash
+$ curl --location --request GET 'localhost:3000/api/v1/games?name=test'
+```
+
+_Note: more examples about the other CRUD operations [here](examples)_
 
 _Note 2: unit testing has low coverage and was added as a demonstration_

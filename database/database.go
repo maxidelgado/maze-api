@@ -39,6 +39,11 @@ func New() Repository {
 		panic(err)
 	}
 
+	_, err = mazeColl.Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{{"name", "text"}}})
+	if err != nil {
+		panic(err)
+	}
+
 	return database{
 		mazeColl: mazeColl,
 		gameColl: gameColl,
@@ -48,6 +53,24 @@ func New() Repository {
 type database struct {
 	mazeColl *mongo.Collection
 	gameColl *mongo.Collection
+}
+
+func (d database) QueryMaze(ctx context.Context, name string) ([]maze.Maze, error) {
+	var result []maze.Maze
+	cursor, err := mongodb(ctx).Find(d.mazeColl, name)
+	if err != nil {
+		return nil, err
+	}
+
+	for cursor.Next(ctx) {
+		var m maze.Maze
+		if err := cursor.Decode(&m); err != nil {
+			return nil, err
+		}
+		result = append(result, m)
+	}
+
+	return result, err
 }
 
 func (d database) QueryGames(ctx context.Context, name string) ([]game.Game, error) {

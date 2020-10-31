@@ -38,6 +38,7 @@ POST /api/v1/mazes :
 */
 func (h mazeHandler) postMaze(ctx *fiber.Ctx) error {
 	var body struct {
+		Name   string           `json:"name"`
 		Center maze.Coordinates `json:"center"`
 		Spots  []maze.Spot      `json:"spots"`
 		Paths  []maze.Path      `json:"paths"`
@@ -47,7 +48,7 @@ func (h mazeHandler) postMaze(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	id, err := h.svc.Create(ctx.Context(), body.Center, body.Spots, body.Paths)
+	id, err := h.svc.Create(ctx.Context(), body.Name, body.Center, body.Spots, body.Paths)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -155,4 +156,25 @@ func (h mazeHandler) deleteMaze(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.SendStatus(http.StatusOK)
+}
+
+/*
+GET /api/v1/mazes?name=game_name
+	Search matching mazes with a given name
+*/
+func (h mazeHandler) searchMazes(ctx *fiber.Ctx) error {
+	name := ctx.Query("name")
+	if name == "" {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "name param is required"})
+	}
+
+	response, err := h.svc.Query(ctx.Context(), name)
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	if len(response) == 0 {
+		return ctx.SendStatus(http.StatusNotFound)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(response)
 }

@@ -109,6 +109,9 @@ GET /api/v1/games?name=game_name
 */
 func (h gamesHandler) searchGames(ctx *fiber.Ctx) error {
 	name := ctx.Query("name")
+	if name == "" {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "name param is required"})
+	}
 
 	response, err := h.svc.Query(ctx.Context(), name)
 	if err != nil {

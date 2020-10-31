@@ -21,6 +21,7 @@ const (
 
 type Maze struct {
 	Id        string      `json:"id" bson:"_id"`
+	Name      string      `json:"name"`
 	Entrance  string      `json:"-"`
 	Exit      string      `json:"-"`
 	Quadrants [4]Quadrant `json:"quadrants"`
