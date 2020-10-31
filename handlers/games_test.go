@@ -35,7 +35,7 @@ func Test_gamesHandler_postGame(t *testing.T) {
 		{
 			name: "success: game created",
 			fields: fields{
-				svc: gamesSvcMock{start: func(ctx context.Context, s2 string) (game.Game, error) {
+				svc: gamesSvcMock{start: func(context.Context, string, string) (game.Game, error) {
 					return game.Game{}, nil
 				}},
 			},
@@ -58,7 +58,7 @@ func Test_gamesHandler_postGame(t *testing.T) {
 			name: "fail: service error",
 			fields: fields{
 				svc: gamesSvcMock{
-					start: func(ctx context.Context, s2 string) (game.Game, error) {
+					start: func(context.Context, string, string) (game.Game, error) {
 						return game.Game{}, errors.New("error")
 					},
 				},
@@ -98,9 +98,9 @@ func doRequest(url, method string, svc game.Service, reader io.Reader) (*http.Re
 
 type gamesSvcMock struct {
 	game.Service
-	start func(ctx context.Context, s2 string) (game.Game, error)
+	start func(ctx context.Context, mazeId, name string) (game.Game, error)
 }
 
-func (s gamesSvcMock) Start(ctx context.Context, mazeId string) (game.Game, error) {
-	return s.start(ctx, mazeId)
+func (s gamesSvcMock) Start(ctx context.Context, mazeId, name string) (game.Game, error) {
+	return s.start(ctx, mazeId, name)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/maxidelgado/maze-api/database/mgo"
 	"github.com/maxidelgado/maze-api/domain/game"
 	"github.com/maxidelgado/maze-api/domain/maze"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -33,6 +34,11 @@ func New() Repository {
 	mazeColl := client.Database(config.DB.Database).Collection(config.DB.MazeCollection)
 	gameColl := client.Database(config.DB.Database).Collection(config.DB.GameCollection)
 
+	_, err = gameColl.Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{{"name", "text"}}})
+	if err != nil {
+		panic(err)
+	}
+
 	return database{
 		mazeColl: mazeColl,
 		gameColl: gameColl,
@@ -42,6 +48,24 @@ func New() Repository {
 type database struct {
 	mazeColl *mongo.Collection
 	gameColl *mongo.Collection
+}
+
+func (d database) QueryGames(ctx context.Context, name string) ([]game.Game, error) {
+	var result []game.Game
+	cursor, err := mongodb(ctx).Find(d.gameColl, name)
+	if err != nil {
+		return nil, err
+	}
+
+	for cursor.Next(ctx) {
+		var g game.Game
+		if err := cursor.Decode(&g); err != nil {
+			return nil, err
+		}
+		result = append(result, g)
+	}
+
+	return result, err
 }
 
 func (d database) GetGame(ctx context.Context, id string) (game.Game, error) {

@@ -13,6 +13,12 @@ type Client interface {
 	DeleteDocument(coll *mongo.Collection, id string) error
 	Update(coll *mongo.Collection, id string, obj interface{}) error
 	Put(coll *mongo.Collection, obj interface{}) error
+	Find(coll *mongo.Collection, value string) (Cursor, error)
+}
+
+type Cursor interface {
+	Next(ctx context.Context) bool
+	Decode(val interface{}) error
 }
 
 func WithContext(ctx context.Context) Client {
@@ -31,6 +37,10 @@ func (db mongodb) Get(coll *mongo.Collection, id string, out interface{}) error 
 	}
 
 	return err
+}
+
+func (db mongodb) Find(coll *mongo.Collection, value string) (Cursor, error) {
+	return coll.Find(db.ctx, bson.D{{Key: "$text", Value: bson.D{{"$search", value}}}})
 }
 
 func (db mongodb) DeleteDocument(coll *mongo.Collection, id string) error {

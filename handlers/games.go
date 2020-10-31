@@ -20,6 +20,7 @@ func (h gamesHandler) setupRoutes() {
 	m := h.router.Group("/games")
 	{
 		m.Post("", h.postGame)
+		m.Get("", h.searchGames)
 		m.Get("/:id", h.getGame)
 		m.Delete("/:id", h.deleteGame)
 		m.Put("/:id/move", h.putMove)
@@ -97,6 +98,24 @@ func (h gamesHandler) putMove(ctx *fiber.Ctx) error {
 	response, err := h.svc.Move(ctx.Context(), id, body.Spot)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return ctx.Status(http.StatusOK).JSON(response)
+}
+
+/*
+GET /api/v1/games?name=game_name
+	Search matching games with a given name
+*/
+func (h gamesHandler) searchGames(ctx *fiber.Ctx) error {
+	name := ctx.Query("name")
+
+	response, err := h.svc.Query(ctx.Context(), name)
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	if len(response) == 0 {
+		return ctx.SendStatus(http.StatusNotFound)
 	}
 
 	return ctx.Status(http.StatusOK).JSON(response)

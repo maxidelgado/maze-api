@@ -7,6 +7,11 @@ type Mock struct {
 	DeleteFunc func(coll *mongo.Collection, id string) error
 	UpdateFunc func(coll *mongo.Collection, id string, obj interface{}) error
 	PutFunc    func(coll *mongo.Collection, obj interface{}) error
+	FindFunc   func(coll *mongo.Collection, value string) (Cursor, error)
+}
+
+func (m Mock) Find(coll *mongo.Collection, value string) (Cursor, error) {
+	return m.FindFunc(coll, value)
 }
 
 func (m Mock) Get(coll *mongo.Collection, id string, out interface{}) error {

@@ -19,6 +19,10 @@ type gameSvc struct {
 	db      game.DataBase
 }
 
+func (s gameSvc) Query(ctx context.Context, name string) ([]game.Game, error) {
+	return s.db.QueryGames(ctx, name)
+}
+
 func (s gameSvc) Start(ctx context.Context, mazeId, name string) (game.Game, error) {
 	if name == "" {
 		return game.Game{}, errors.New("game name must be provided")

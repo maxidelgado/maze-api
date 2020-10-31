@@ -9,6 +9,7 @@ type Service interface {
 	Get(context.Context, string) (Game, error)
 	Move(context.Context, string, string) (Game, error)
 	Delete(context.Context, string) error
+	Query(ctx context.Context, name string) ([]Game, error)
 }
 
 type DataBase interface {
@@ -16,4 +17,5 @@ type DataBase interface {
 	PutGame(context.Context, Game) error
 	UpdateGame(context.Context, Game) error
 	DeleteGame(context.Context, string) error
+	QueryGames(context.Context, string) ([]Game, error)
 }

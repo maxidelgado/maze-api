@@ -28,12 +28,16 @@ type dbMock struct {
 	put    func(context.Context, game.Game) error
 	update func(context.Context, game.Game) error
 	delete func(context.Context, string) error
+	query  func(context.Context, string) ([]game.Game, error)
 }
 
 func (d dbMock) GetGame(ctx context.Context, id string) (game.Game, error) { return d.get(ctx, id) }
 func (d dbMock) PutGame(ctx context.Context, g game.Game) error            { return d.put(ctx, g) }
 func (d dbMock) UpdateGame(ctx context.Context, g game.Game) error         { return d.update(ctx, g) }
 func (d dbMock) DeleteGame(ctx context.Context, id string) error           { return d.delete(ctx, id) }
+func (d dbMock) QueryGames(ctx context.Context, name string) ([]game.Game, error) {
+	return d.query(ctx, name)
+}
 
 func Test_service_Move(t *testing.T) {
 	type fields struct {
