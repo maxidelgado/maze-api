@@ -65,7 +65,7 @@ func Test_service_Move(t *testing.T) {
 				},
 				db: dbMock{
 					get: func(ctx context.Context, s string) (game.Game, error) {
-						return game.Game{PlayerStats: game.PlayerStats{AllowedMovements: []string{"[1,1]"}}}, nil
+						return game.Game{PlayerStats: game.PlayerStats{AllowedMovements: []maze.Neighbour{{Key: "[1,1]"}}}}, nil
 					},
 					update: func(ctx context.Context, g game.Game) error {
 						return nil
@@ -110,7 +110,7 @@ func Test_service_Move(t *testing.T) {
 				},
 				db: dbMock{
 					get: func(ctx context.Context, s string) (game.Game, error) {
-						return game.Game{PlayerStats: game.PlayerStats{AllowedMovements: []string{"[1,1]"}}}, nil
+						return game.Game{PlayerStats: game.PlayerStats{AllowedMovements: []maze.Neighbour{{Key: "[1,1]"}}}}, nil
 					},
 					update: func(ctx context.Context, g game.Game) error {
 						return nil

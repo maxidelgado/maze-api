@@ -196,3 +196,13 @@ func (m *Maze) GetPath(origin, destiny string) (float64, []string) {
 
 	return 0, nil
 }
+
+func (m *Maze) GetAllowedMovements(key string) []Neighbour {
+	neighbours := m.GetNeighbours(key)
+	var movements []Neighbour
+	for key := range neighbours {
+		spot, _ := m.FindSpot(key)
+		movements = append(movements, Neighbour{Key: spot.Coordinate.Key(), Name: spot.Name})
+	}
+	return movements
+}

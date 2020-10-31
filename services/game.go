@@ -41,11 +41,7 @@ func (s gameSvc) Start(ctx context.Context, mazeId, name string) (game.Game, err
 	}
 
 	// get the spots connected to the entrance spot
-	neighbours := m.GetNeighbours(entrance)
-	var allowedMovements []string
-	for key := range neighbours {
-		allowedMovements = append(allowedMovements, key)
-	}
+	allowedMovements := m.GetAllowedMovements(entrance)
 
 	g := game.Game{
 		Id:              uuid.New().String(),
@@ -87,7 +83,7 @@ func (s gameSvc) Move(ctx context.Context, gameId string, nextSpot string) (game
 	// check if the selected spot is connected to the current one
 	var canMove bool
 	for _, allowedMovement := range g.PlayerStats.AllowedMovements {
-		if nextSpot == allowedMovement {
+		if nextSpot == allowedMovement.Key {
 			canMove = true
 			break
 		}
@@ -104,12 +100,8 @@ func (s gameSvc) Move(ctx context.Context, gameId string, nextSpot string) (game
 		_, g.OptimumPath = g.Maze.GetPath(g.Maze.Entrance, g.Maze.Exit)
 	default:
 		// if the selected spot is not final and is valid
-		neighbours := g.Maze.GetNeighbours(nextSpot)
-		var movements []string
-		for key := range neighbours {
-			movements = append(movements, key)
-		}
-		g.SetAllowedMovements(movements)
+		allowedMovements := g.Maze.GetAllowedMovements(nextSpot)
+		g.SetAllowedMovements(allowedMovements)
 	}
 
 	// ensure that we add gold only the first time

@@ -56,7 +56,7 @@ func (g *Game) SetCurrentSpot(selectedSpot string) {
 }
 
 // Set the allowed movements (player can't move to an out of radar spot)
-func (g *Game) SetAllowedMovements(movements []string) {
+func (g *Game) SetAllowedMovements(movements []maze.Neighbour) {
 	g.PlayerStats.AllowedMovements = movements
 }
 
@@ -80,9 +80,9 @@ type Movement struct {
 
 // Represents the player stats
 type PlayerStats struct {
-	TotalGold        int        `json:"total_gold"`
-	DistanceCovered  float64    `json:"distance_covered"`
-	CurrentSpot      string     `json:"current_spot"`
-	Movements        []Movement `json:"movements,omitempty"`
-	AllowedMovements []string   `json:"allowed_movements,omitempty"`
+	TotalGold        int              `json:"total_gold"`
+	DistanceCovered  float64          `json:"distance_covered"`
+	CurrentSpot      string           `json:"current_spot"`
+	Movements        []Movement       `json:"movements,omitempty"`
+	AllowedMovements []maze.Neighbour `json:"allowed_movements,omitempty"`
 }
